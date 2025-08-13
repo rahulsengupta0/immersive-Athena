@@ -1,100 +1,93 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  PlayCircle,
-  Route,
-  BarChart3,
-  Clock,
-  Users,
-  Smartphone
+  PlayCircle, Route, BarChart3, Clock, Users, Smartphone
 } from 'lucide-react';
+
+import interactive from '../assets/interactive.jpg';
+import custom from '../assets/custom1.jpg';
+import analytics from '../assets/analytics.jpg';
+import live from '../assets/live.jpg';
+import user from '../assets/user.jpg';
+import mobile from '../assets/mobile.jpg';
+
+// Register GSAP plugin
+gsap.registerPlugin(ScrollTrigger);
 
 const platformFeatures = [
   {
-    icon: <PlayCircle size={24} />,
+    icon: <PlayCircle size={32} />,
     title: "Interactive Learning Tools",
-    description: "Build engaging lessons with videos, quizzes & activities."
+    description: "Build engaging lessons with videos, quizzes & activities.",
+    image: interactive
   },
   {
-    icon: <Route size={24} />,
+    icon: <Route size={32} />,
     title: "Custom Learning Paths",
-    description: "Create personalized learning journeys for different teams or departments."
+    description: "Create personalized learning journeys for different teams or departments.",
+    image: custom
   },
   {
-    icon: <BarChart3 size={24} />,
+    icon: <BarChart3 size={32} />,
     title: "Analytics & Progress Tracking",
-    description: "Monitor learner engagement and performance in real time."
+    description: "Monitor learner engagement and performance in real time.",
+    image: analytics
   },
   {
-    icon: <Clock size={24} />,
+    icon: <Clock size={32} />,
     title: "Live & Self-Paced Learning",
-    description: "Support both scheduled sessions and anytime access."
+    description: "Support both scheduled sessions and anytime access.",
+    image: live
   },
   {
-    icon: <Users size={24} />,
+    icon: <Users size={32} />,
     title: "User Management",
-    description: "Easy tools to manage learners, instructors, and admins."
+    description: "Easy tools to manage learners, instructors, and admins.",
+    image: user
   },
   {
-    icon: <Smartphone size={24} />,
+    icon: <Smartphone size={32} />,
     title: "Mobile-Friendly Platform",
-    description: "Access learning anytime, on any device."
+    description: "Access learning anytime, on any device.",
+    image: mobile
   }
 ];
 
 const AthenaPlatformFeatures = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const cardsRef = useRef([]);
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
+    const cards = cardsRef.current;
+
+    gsap.fromTo(
+      cards,
+      { opacity: 0, x: 100 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.2,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%', // when section is 80% from top of viewport
+          toggleActions: 'play none none reverse', // smooth trigger / reverse on scroll up
         }
-      },
-      { threshold: 0.1 }
+      }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      ScrollTrigger.getAll().forEach(t => t.kill());
     };
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    show: { y: 0, opacity: 1 }
-  };
-
   return (
-    <section className="py-16 relative overflow-hidden bg-[#09090a]">
-      {/* DecorativeShapes removed for cleaner look */}
-      <div className="section-container relative z-10" ref={sectionRef}>
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center mb-12"
-        >
+    <section ref={sectionRef} className="py-16 relative overflow-hidden bg-[#09090a]">
+      <div className="section-container relative z-10">
+        {/* Header */}
+        <div className="text-center mb-12">
           <p className="text-[#60a5fa] font-medium text-lg mb-2">
             Platform Capabilities
           </p>
@@ -105,59 +98,44 @@ const AthenaPlatformFeatures = () => {
             Discover the powerful features that make Athena the complete LMS solution
             for modern educational institutions and organizations.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Features Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isVisible ? "show" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
-        >
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 max-w-7xl mx-auto">
           {platformFeatures.map((feature, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={itemVariants}
-              whileHover={{
-                y: -4,
-                scale: 1.02,
-                transition: { duration: 0.2, ease: "easeOut" }
-              }}
-              className="group cursor-pointer"
+              ref={el => (cardsRef.current[index] = el)}
+              className="group cursor-pointer relative overflow-hidden border border-gray-800 shadow-lg transition-all duration-400 bg-[#121214] min-h-[520px] flex flex-col justify-end"
+              style={{ borderCollapse: "collapse" }}
             >
-              <div className="
-                p-6 rounded-2xl border border-gray-800 bg-[#121214]
-                shadow-sm hover:shadow-lg hover:shadow-blue-400/10
-                transition-all duration-300 h-full
-                hover:border-[#60a5fa]/20
-              ">
-                {/* Icon with background */}
-                <div className="
-                  w-12 h-12 rounded-xl bg-gray-800
-                  flex items-center justify-center mb-4
-                  group-hover:bg-[#60a5fa] group-hover:scale-105
-                  transition-all duration-300
-                ">
-                  {React.cloneElement(feature.icon, {
-                    className: "text-[#60a5fa] group-hover:text-white transition-colors duration-300"
-                  })}
+              {/* Background image with tint */}
+              <div
+                className="absolute inset-0 z-0 transition-transform duration-500 ease-[cubic-bezier(.4,2,.7,1)] group-hover:scale-105 group-hover:brightness-110 transform-gpu"
+                style={{
+                  backgroundImage: `linear-gradient(120deg, rgba(43,120,253,0.25) 45%, rgba(43,120,253,0.15) 100%), url(${feature.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              {/* Blue overlay */}
+              <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-blue-500/25 to-blue-600/10 opacity-60 transition-transform transition-opacity duration-500 transform-gpu scale-90 group-hover:opacity-90 group-hover:scale-105"></div>
+
+              {/* Content */}
+              <div className="relative z-10 flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105 group-hover:drop-shadow-xl">
+                <div className="w-24 h-24 bg-[#60a5fa]/90 flex items-center justify-center transition-transform transition-shadow duration-400 group-hover:scale-110 group-hover:shadow-2xl">
+                  {React.cloneElement(feature.icon, { className: "text-white", size: 42 })}
                 </div>
-                {/* Title */}
-                <h3 className="
-                  text-xl font-bold mb-3 text-white
-                  group-hover:text-[#60a5fa]
-                  transition-colors duration-300
-                ">
+                <h3 className="text-3xl font-bold text-white transition-all duration-300 group-hover:text-[#60a5fa]">
                   {feature.title}
                 </h3>
-                {/* Description */}
-                <p className="text-gray-400 text-sm leading-relaxed">
+                <p className="text-gray-200 text-base leading-relaxed max-w-[350px]">
                   {feature.description}
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
